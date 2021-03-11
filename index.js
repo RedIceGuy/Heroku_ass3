@@ -50,11 +50,11 @@ function checkIfArchived(tasksList) {
 var BoardID = 4;
 var TaskID = 4;
 
-app.get('/api/v1/boards', (req, res) => { // GET all boards  XXXXXXXXXXXXXXXXXXXXXXXX
+app.get('/api/v1/boards', (req, res) => { // GET all boards  
     return res.status(200).json(boards);
 });
 
-app.get('/api/v1/boards/:boardid', (req, res) => { // GET an individual board  XXXXXXXXXXXXXXXXXXXXXXXX
+app.get('/api/v1/boards/:boardid', (req, res) => { // GET an individual board  
     var boardId = req.params.boardid;
     for (let i=0; i<boards.length; i++) {
         if (boards[i].id == boardId) {
@@ -65,7 +65,7 @@ app.get('/api/v1/boards/:boardid', (req, res) => { // GET an individual board  X
     return res.status(404);
 });
 
-app.post('/api/v1/boards/', (req, res) => { // Create new board  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+app.post('/api/v1/boards/', (req, res) => { // Create new board  
     var boardName = req.body.name;
     var boardDescription = req.body.description;
     if (boardName !== "") {
@@ -82,7 +82,7 @@ app.patch('/api/v1/boards/:boardid', (req, res) => { // UPDATE a board
     var newName = req.body.name;
     var newDesc = req.body.description;
     var boardToUpdateID = req.params.boardid;
-    for (let i=0; k<boards.length; k++) { // TODO Check to see if there are any tasks on the board which have not been archived
+    for (let i=0; k<boards.length; k++) {
         if (boards[k].id === boardToUpdateID) {
             var boardToUpdate = boards[k];
             if (checkIfArchived(boardToUpdate.tasks) === true) {
@@ -102,8 +102,6 @@ app.delete('/api/v1/boards/:boardid', (req, res) => { // DELETE a board
             ThisBoard = boards[i];
             for (let j=0; j<ThisBoard.tasks.length; j++) {
                 if (tasks[j].archived === false) { 
-                    // TODO Thinks that board 'Done' has an unarchived task
-                    // when it is already archived
                     return res.status(400);
                 }
             }
@@ -113,10 +111,26 @@ app.delete('/api/v1/boards/:boardid', (req, res) => { // DELETE a board
 });
 
 app.delete('/api/v1/boards/deleteallboards', (req, res) => { // DELETE all boards
-
+    var boardId = req.params.boardid;
+    for (let i = 0; i < boards.length; i++) {
+        if (boards[i].id == boardId) {
+            var ThisBoard = boards[i];
+            var tasksList = ThisBoard.tasks;
+            var tasksRetList = Array();
+            for (let j = 0; j < tasksList.length; j++) { // Iterate through the boards' tasks
+                for (let k = 0; k < tasks.length; k++) { // Iterate through all stored tasks
+                    if (tasks[k].id === tasksList[j]) { // Find the task which belongs to the board
+                        tasksRetList.push(tasks[k])
+                    }
+                }
+            }
+            return res.status(200).send(ThisBoard, tasksRetList);
+        }
+    }
+    return res.status(404);
 });
 
-app.get('/api/v1/boards/:boardid/tasks', (req, res) => { // GET all tasks  XXXXXXXXXXXXXXXXXXXXX
+app.get('/api/v1/boards/:boardid/tasks', (req, res) => { // GET all tasks  
     var boardId = req.params.boardid;
     for (let i=0; i<boards.length; i++) {
         if (boards[i].id == boardId) {
@@ -136,7 +150,7 @@ app.get('/api/v1/boards/:boardid/tasks', (req, res) => { // GET all tasks  XXXXX
     return res.status(404);
 });
 
-app.get('/api/v1/boards/:boardid/:taskid', (req, res) => { //TODO GET a single task  NOT READY USE BOARDID IN TASKS instead of boards array
+app.get('/api/v1/boards/:boardid/:taskid', (req, res) => {
     var boardId = req.params.boardid;
     var taskId = req.params.taskid;
     for (let i=0; i<boards.length; i++) {
@@ -157,7 +171,7 @@ app.get('/api/v1/boards/:boardid/:taskid', (req, res) => { //TODO GET a single t
     return res.status(404);
 });
 
-app.post('/api/v1/boards/:boardid/tasks', (req, res) => { // Create new task in board  XXXXXXXXXXXXXXXXXXXXX
+app.post('/api/v1/boards/:boardid/tasks', (req, res) => { // Create new task in board  
     var taskName = req.body.taskName;
     var boardId = req.params.boardid;
     for (let i=0; i<boards.length; i++) {
@@ -174,7 +188,7 @@ app.post('/api/v1/boards/:boardid/tasks', (req, res) => { // Create new task in 
     return res.status(400);
 });
 
-app.delete('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // DELETE a task  XXXXXXXXXXXXXXXXXXXXXXXXX
+app.delete('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // DELETE a task  
     var taskId = req.params.taskid;
     var boardId = req.params.boardId;
     for (let i=0; i <boards.length; i++) {
@@ -197,7 +211,7 @@ app.delete('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // DELETE a 
     return res.status(400);
 });
 
-app.patch('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // Archive task  XXXXXXXXXXXXXXXXXXXXXXXXX
+app.patch('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // Archive task  
     var taskId = req.params.taskid;
     for (let i=0; i<tasks.length; i++) {
         if (tasks[i].id == taskId) {
@@ -209,7 +223,7 @@ app.patch('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // Archive ta
     return res.status(400);
 });
 
-app.patch('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // Rename task  XXXXXXXXXXXXXXXXXXXXXXXXX
+app.patch('/api/v1/boards/:boardid/tasks/:taskid', (req, res) => { // Rename task  
     var taskId = req.params.taskid;
     var newTaskName = req.body.taskName;
     for (let i=0; i<tasks.length; i++) {
